@@ -20,6 +20,16 @@ var manoRadio = 15;
 var manoAltura = 40;
 var posAnt;
 var robot;
+var gui = new lil.GUI();
+var animacionActiva = false;
+var objetivos = {
+    giroBase: 0,
+    giroBrazo: 0,
+    giroAntebrazoY: 0,
+    giroAntebrazoZ: 0,
+    RotacionPinzaZ: 0,
+    Apertura: 0
+};
 
 // 1-inicializa 
 init();
@@ -76,50 +86,49 @@ function loadScene()
   let materialEje = new THREE.MeshBasicMaterial({color: 0xfce914});
   let eje = new THREE.Mesh(geometriaEje, materialEje);
   eje.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
-  eje.position.y = baseAltura;
+  
   //scene.add(eje);
 
   let geometriaEsparrago = new THREE.BoxGeometry(esparragoX, esparragoY, esparragoZ);
   let materialEsparrago = new THREE.MeshBasicMaterial({color: 0xe60e07});
   let esparrago = new THREE.Mesh(geometriaEsparrago, materialEsparrago);
-  esparrago.position.y = baseAltura+esparragoY/2;
+  esparrago.position.y = esparragoY/2;
   //scene.add(esparrago);
 
   let rotulaGeometria = new THREE.SphereGeometry(rotulaRadio, 32, 32);
   let rotulaMaterial = new THREE.MeshBasicMaterial({color: 0xfce914});
   let rotula = new THREE.Mesh(rotulaGeometria, rotulaMaterial);
-  rotula.position.y = baseAltura+esparragoY;
+  rotula.position.y = esparragoY;
   //scene.add(rotula);
 
 
   let discoGeometria = new THREE.CylinderGeometry(discoRadio, discoRadio, discoAltura, 32);
   let discoMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
   let disco = new THREE.Mesh(discoGeometria, discoMaterial);
-  disco.position.y=baseAltura +esparragoY;
   //scene.add(disco);
 
   let nervioGeometria = new THREE.BoxGeometry(nervioX, nervioY, nervioZ);
   let nervioMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
   let nervio1 = new THREE.Mesh(nervioGeometria, nervioMaterial);
-  nervio1.position.y = baseAltura +esparragoY+ discoAltura+ nervioY/2;
+  nervio1.position.y = discoAltura+ nervioY/2;
   nervio1.position.x = 10;
   nervio1.position.z = 10;
   //scene.add(nervio1);
 
   let nervio2 = new THREE.Mesh(nervioGeometria, nervioMaterial);
-  nervio2.position.y = baseAltura +esparragoY+ discoAltura+ nervioY/2;
+  nervio2.position.y = discoAltura+ nervioY/2;
   nervio2.position.x = -10;
   nervio2.position.z = 10;
   //scene.add(nervio2);
 
   let nervio3 = new THREE.Mesh(nervioGeometria, nervioMaterial);
-  nervio3.position.y = baseAltura +esparragoY+ discoAltura+ nervioY/2;
+  nervio3.position.y = discoAltura+ nervioY/2;
   nervio3.position.x = -10;
   nervio3.position.z = -10;
   //scene.add(nervio3);
 
   let nervio4 = new THREE.Mesh(nervioGeometria, nervioMaterial);
-  nervio4.position.y = baseAltura +esparragoY+ discoAltura+ nervioY/2;
+  nervio4.position.y = discoAltura+ nervioY/2;
   nervio4.position.x = 10;
   nervio4.position.z = -10;
   //scene.add(nervio4);
@@ -128,13 +137,12 @@ function loadScene()
   let manoMaterial = new THREE.MeshBasicMaterial({color: 0xfce914});
   let mano = new THREE.Mesh(manoGeometria, manoMaterial);
   mano.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
-  mano.position.y = baseAltura +esparragoY+ discoAltura+ nervioY;
+  
   //scene.add(mano);
 
     let agarreGeometria = new THREE.BoxGeometry(19, 20, 4);
   let agarreMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
   let agarre = new THREE.Mesh(agarreGeometria, agarreMaterial);
-  agarre.position.y = baseAltura +esparragoY+ discoAltura+ nervioY;
   agarre.position.x=19/2;
   agarre.position.z=10
   //scene.add(agarre)
@@ -184,7 +192,7 @@ function loadScene()
   dedoGeometria.setAttribute('position', new THREE.BufferAttribute(verticesDedo, 3));
   let dedoMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
   let dedo = new THREE.Mesh(dedoGeometria, dedoMaterial);
-  dedo.position.y = dedo.position.y + baseAltura +esparragoY+ discoAltura+ nervioY -10;
+  dedo.position.y = dedo.position.y -10;
   dedo.position.x = 19;
   dedo.position.z = -2+10;
   //scene.add(dedo);
@@ -195,7 +203,6 @@ function loadScene()
   //scene.add(pinzaDe);
 
   let agarre2 = new THREE.Mesh(agarreGeometria, agarreMaterial);
-  agarre2.position.y = baseAltura +esparragoY+ discoAltura+ nervioY;
   agarre2.position.x=19/2;
   agarre2.position.z = -10
   //scene.add(agarre2)
@@ -203,7 +210,7 @@ function loadScene()
   let dedo2 = new THREE.Mesh(dedoGeometria, dedoMaterial);
   dedo2.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI) ;
   dedo2.position.x = 19;
-  dedo2.position.y = dedo2.position.y + baseAltura +esparragoY+ discoAltura+ nervioY -10+20;
+  dedo2.position.y = dedo2.position.y -10+20;
   dedo2.position.z = -8;   
   //scene.add(dedo2)
 
@@ -216,6 +223,7 @@ function loadScene()
   mano_completa.add(mano);
   mano_completa.add(pinzaDe);
   mano_completa.add(pinzaIz);
+  mano_completa.position.y = discoAltura+ nervioY;
   //scene.add(mano_completa);
 
   nervios = new THREE.Group();
@@ -229,6 +237,7 @@ function loadScene()
   antebrazo.add(mano_completa);
   antebrazo.add(nervios);
   antebrazo.add(disco);
+  antebrazo.position.y = esparragoY;
   //scene.add(antebrazo);
 
   brazo = new THREE.Group();
@@ -236,6 +245,7 @@ function loadScene()
   brazo.add(esparrago);
   brazo.add(rotula);
   brazo.add(antebrazo);
+  brazo.position.y = baseAltura;
   //scene.add(brazo);
 
   robot = new THREE.Group();
@@ -258,6 +268,8 @@ function update()
 {
   // Cambios para actualizar la camara segun mvto del raton
   cameraControls.update();
+  actualizarAnimacion();
+  
 }
 
 function render()
@@ -292,9 +304,35 @@ function crearControles() {
       giroBrazo: 0,
       giroAntebrazoY: 0,
       giroAntebrazoZ: 0,
+      RotacionPinzaZ: 0,
+      Apertura: 7,
+      Alambre: false,
+      Animacion: function() {
+        animacionActiva = true;
+        //Crear animacion, elegir un valor para cada articulacion y hacer que se mueva a ese valor
+        // Generar nuevos valores aleatorios
+        controles.giroBase = aleatorio(-180, 180);
+        controles.giroBrazo = aleatorio(-45, 45);
+        controles.giroAntebrazoY = aleatorio(-180, 180);
+        controles.giroAntebrazoZ = aleatorio(-90, 90);
+        controles.RotacionPinzaZ = aleatorio(-40, 220);
+        controles.Apertura = aleatorio(0, 15);
+
+        // Copiar los valores a los objetivos
+        objetivos.giroBase = controles.giroBase;
+        objetivos.giroBrazo = controles.giroBrazo;
+        objetivos.giroAntebrazoY = controles.giroAntebrazoY;
+        objetivos.giroAntebrazoZ = controles.giroAntebrazoZ;
+        objetivos.RotacionPinzaZ = controles.RotacionPinzaZ;
+        objetivos.Apertura = controles.Apertura;
+
+        gui.controllersRecursive().forEach(c => c.updateDisplay());
+        actualizarAnimacion();
+        
+      }
   };
 
-  const gui = new lil.GUI();
+  
 
   gui.add(controles, "giroBase", -180, 180, 1)
       .name("Giro Base")
@@ -317,11 +355,114 @@ function crearControles() {
               THREE.MathUtils.degToRad(angulo);
       });
 
-    /*gui.add(controles, "giroAntebrazoZ", -90, 90, 1)
-      .name("Giro Antebrazo Y")
+    gui.add(controles, "giroAntebrazoZ", -90, 90, 1)
+      .name("Giro Antebrazo Z")
       .onChange((angulo) => {
           antebrazo.rotation.z =
               THREE.MathUtils.degToRad(angulo);
-      });*/
+      });
+    gui.add(controles, "RotacionPinzaZ", -40, 220, 1)
+      .name("Giro Pinza")
+      .onChange((angulo) => {
+          mano_completa.rotation.z =
+              THREE.MathUtils.degToRad(angulo);
+      });
+      gui.add(controles, "Apertura", 0, 15, 1)
+      .name("Separación Pinza")
+      .onChange((sep) => {
+          pinzaDe.position.z = -7.1+sep;
+          pinzaIz.position.z = 7.1-sep;
+      }
+    );
+
+    gui.add(controles, "Alambre")
+      .name("Alambre")
+      .onChange((value) => {
+        if (value) {
+            robot.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    child.material.wireframe = true;
+                }
+            });
+        } else {
+            robot.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    child.material.wireframe = false;
+                }
+            });
+        }
+    });
+
+    gui.add(controles, "Animacion")
+      .name("Animacion");
+}
+
+function aleatorio(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function actualizarAnimacion() {
+
+    if (!animacionActiva) return;
+
+    const velocidad = 0.05;
+
+    robot.rotation.y = THREE.MathUtils.lerp(
+        robot.rotation.y,
+        THREE.MathUtils.degToRad(objetivos.giroBase),
+        velocidad
+    );
+
+    brazo.rotation.z = THREE.MathUtils.lerp(
+        brazo.rotation.z,
+        THREE.MathUtils.degToRad(objetivos.giroBrazo),
+        velocidad
+    );
+
+    antebrazo.rotation.y = THREE.MathUtils.lerp(
+        antebrazo.rotation.y,
+        THREE.MathUtils.degToRad(objetivos.giroAntebrazoY),
+        velocidad
+    );
+
+    antebrazo.rotation.z = THREE.MathUtils.lerp(
+        antebrazo.rotation.z,
+        THREE.MathUtils.degToRad(objetivos.giroAntebrazoZ),
+        velocidad
+    );
+
+    mano_completa.rotation.z = THREE.MathUtils.lerp(
+        mano_completa.rotation.z,
+        THREE.MathUtils.degToRad(objetivos.RotacionPinzaZ),
+        velocidad
+    );
+
+    pinzaDe.position.z = THREE.MathUtils.lerp(
+        pinzaDe.position.z,
+        -7.1 + objetivos.Apertura,
+        velocidad
+    );
+
+    pinzaIz.position.z = THREE.MathUtils.lerp(
+        pinzaIz.position.z,
+        7.1 - objetivos.Apertura,
+        velocidad
+    );
+
+    // Comprobar si ha llegado al destino
+    const destinoAlcanzado =
+        Math.abs(robot.rotation.y - THREE.MathUtils.degToRad(objetivos.giroBase)) < 0.1 &&
+        Math.abs(brazo.rotation.z - THREE.MathUtils.degToRad(objetivos.giroBrazo)) < 0.1 &&
+        Math.abs(antebrazo.rotation.y - THREE.MathUtils.degToRad(objetivos.giroAntebrazoY)) < 0.1 &&
+        Math.abs(antebrazo.rotation.z - THREE.MathUtils.degToRad(objetivos.giroAntebrazoZ)) < 0.1 &&
+        Math.abs(mano_completa.rotation.z - THREE.MathUtils.degToRad(objetivos.RotacionPinzaZ)) < 0.1 &&
+        Math.abs(pinzaDe.position.z - (-7.1 + objetivos.Apertura)) < 0.1;
+
+    //Si no ha llegado al destino, sigue animando
+    
+    if (destinoAlcanzado) {
+        animacionActiva = false;
+        console.log("Animación completada");
+    }
     
 }
