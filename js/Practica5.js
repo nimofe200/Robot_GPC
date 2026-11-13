@@ -193,6 +193,7 @@ function loadScene()
     19, 15, 0,
   ]);
   dedoGeometria.setAttribute('position', new THREE.BufferAttribute(verticesDedo, 3));
+  dedoGeometria.computeVertexNormals();
   let dedoMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
   let dedo = new THREE.Mesh(dedoGeometria, dedoMaterial);
   dedo.position.y = dedo.position.y -10;
