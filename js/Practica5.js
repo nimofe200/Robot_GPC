@@ -31,6 +31,8 @@ var objetivos = {
     Apertura: 0
 };
 
+const textureLoader = new THREE.TextureLoader();
+const texturaSuelo = textureLoader.load('images/suelo-fabrica2.jpg');
 // 1-inicializa 
 init();
 // 2-Crea una escena
@@ -67,7 +69,8 @@ function init()
 function loadScene()
 {
 	// Añade el objeto grafico a la escena
-  let material = new THREE.MeshBasicMaterial({ color: 0xb8b9ba }); 
+    
+  let material = new THREE.MeshStandardMaterial({ map: texturaSuelo}); 
   //let material = new THREE.MeshStandardMaterial({color: 0xb8b9ba});          
 
   //Un suelo (1000 x 1000) en el plano XZ
@@ -77,38 +80,38 @@ function loadScene()
   scene.add(suelo)
 
   let geometriaBase = new THREE.CylinderGeometry(baseRadio, baseRadio, baseAltura, 32);
-  let materialBase = new THREE.MeshBasicMaterial({color: 0xe60e07});
+  let materialBase = new THREE.MeshStandardMaterial({color: 0xe60e07});
   let base = new THREE.Mesh(geometriaBase, materialBase);
   base.position.y = baseAltura/2;
   //scene.add(base);
 
   let geometriaEje =  new THREE.CylinderGeometry(ejeRadio, ejeRadio, ejeAltura, 32);
-  let materialEje = new THREE.MeshBasicMaterial({color: 0xfce914});
+  let materialEje = new THREE.MeshStandardMaterial({color: 0xfce914});
   let eje = new THREE.Mesh(geometriaEje, materialEje);
   eje.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
   
   //scene.add(eje);
 
   let geometriaEsparrago = new THREE.BoxGeometry(esparragoX, esparragoY, esparragoZ);
-  let materialEsparrago = new THREE.MeshBasicMaterial({color: 0xe60e07});
+  let materialEsparrago = new THREE.MeshStandardMaterial({color: 0xe60e07});
   let esparrago = new THREE.Mesh(geometriaEsparrago, materialEsparrago);
   esparrago.position.y = esparragoY/2;
   //scene.add(esparrago);
 
   let rotulaGeometria = new THREE.SphereGeometry(rotulaRadio, 32, 32);
-  let rotulaMaterial = new THREE.MeshBasicMaterial({color: 0xfce914});
+  let rotulaMaterial = new THREE.MeshStandardMaterial({color: 0xfce914});
   let rotula = new THREE.Mesh(rotulaGeometria, rotulaMaterial);
   rotula.position.y = esparragoY;
   //scene.add(rotula);
 
 
   let discoGeometria = new THREE.CylinderGeometry(discoRadio, discoRadio, discoAltura, 32);
-  let discoMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
+  let discoMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
   let disco = new THREE.Mesh(discoGeometria, discoMaterial);
   //scene.add(disco);
 
   let nervioGeometria = new THREE.BoxGeometry(nervioX, nervioY, nervioZ);
-  let nervioMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
+  let nervioMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
   let nervio1 = new THREE.Mesh(nervioGeometria, nervioMaterial);
   nervio1.position.y = discoAltura+ nervioY/2;
   nervio1.position.x = 10;
@@ -134,14 +137,14 @@ function loadScene()
   //scene.add(nervio4);
 
   let manoGeometria =  new THREE.CylinderGeometry(manoRadio, manoRadio, manoAltura, 32);
-  let manoMaterial = new THREE.MeshBasicMaterial({color: 0xfce914});
+  let manoMaterial = new THREE.MeshStandardMaterial({color: 0xfce914});
   let mano = new THREE.Mesh(manoGeometria, manoMaterial);
   mano.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
   
   //scene.add(mano);
 
     let agarreGeometria = new THREE.BoxGeometry(19, 20, 4);
-  let agarreMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
+  let agarreMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
   let agarre = new THREE.Mesh(agarreGeometria, agarreMaterial);
   agarre.position.x=19/2;
   agarre.position.z=10
@@ -190,7 +193,7 @@ function loadScene()
     19, 15, 0,
   ]);
   dedoGeometria.setAttribute('position', new THREE.BufferAttribute(verticesDedo, 3));
-  let dedoMaterial = new THREE.MeshBasicMaterial({color: 0xe60e07});
+  let dedoMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
   let dedo = new THREE.Mesh(dedoGeometria, dedoMaterial);
   dedo.position.y = dedo.position.y -10;
   dedo.position.x = 19;
@@ -253,7 +256,84 @@ function loadScene()
   robot.add(brazo);
   scene.add(robot);
 
+  //Luces
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // luz ambiental
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(300, 300, 300);
+  
+  directionalLight.castShadow = true;
+  directionalLight.shadow.mapSize.width = 1024;
+  directionalLight.shadow.mapSize.height = 1024;
+  directionalLight.shadow.camera.near = 0.5;
+  directionalLight.shadow.camera.far = 2000;
+  directionalLight.shadow.camera.left = -300;
+  directionalLight.shadow.camera.right = 300;
+  directionalLight.shadow.camera.top = 300;
+  directionalLight.shadow.camera.bottom = -300;
+  scene.add(directionalLight);  
+
+  const spotLight = new THREE.SpotLight(0xffffff, 1); // color, intensidad
+  spotLight.position.set(0, 300, 0); // Posicionar la luz de foco
+  spotLight.target.position.set(0, 0, 0); // Apuntar hacia el origen (o hacia cualquier objeto)
+  scene.add(spotLight);
+
+  
+  spotLight.castShadow = true;
+  spotLight.shadow.mapSize.width = 1024; 
+  spotLight.shadow.mapSize.height = 1024;
+  spotLight.shadow.camera.near = 0.5;
+  spotLight.shadow.camera.far = 2000;
+
+    //Hacer que los objetos proyecten y reciban sombras
+    base.castShadow = true;
+    base.receiveShadow = true;
+    eje.castShadow = true;
+    eje.receiveShadow = true;
+    esparrago.castShadow = true;
+    esparrago.receiveShadow = true;
+    rotula.castShadow = true;
+    rotula.receiveShadow = true;
+    disco.castShadow = true;
+    disco.receiveShadow = true;
+    nervio1.castShadow = true;
+    nervio1.receiveShadow = true;
+    nervio2.castShadow = true;
+    nervio2.receiveShadow = true;
+    nervio3.castShadow = true;
+    nervio3.receiveShadow = true;
+    nervio4.castShadow = true;
+    nervio4.receiveShadow = true;
+    mano.castShadow = true;
+    mano.receiveShadow = true;
+    pinzaDe.castShadow = true;
+    pinzaDe.receiveShadow = true;
+    pinzaIz.castShadow = true;
+    pinzaIz.receiveShadow = true;
+    suelo.castShadow = true;
+    suelo.receiveShadow = true;
+    agarre.castShadow = true;
+    agarre.receiveShadow = true;
+    agarre2.castShadow = true;
+    agarre2.receiveShadow = true;
+    dedo.castShadow = true;
+    dedo.receiveShadow = true;
+    dedo2.castShadow = true;
+    dedo2.receiveShadow = true;
+
+    brazo.castShadow = true;
+    brazo.receiveShadow = true;
+    antebrazo.castShadow = true;
+    antebrazo.receiveShadow = true;
+    mano_completa.castShadow = true;
+    mano_completa.receiveShadow = true;
+
+    robot.castShadow = true;
+    robot.receiveShadow = true;
 }
 
 
