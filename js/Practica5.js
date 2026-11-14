@@ -32,7 +32,12 @@ var objetivos = {
 };
 
 const textureLoader = new THREE.TextureLoader();
-const texturaSuelo = textureLoader.load('images/suelo-fabrica2.jpg');
+const texturaPared1 = textureLoader.load('images/im1.png');
+const texturaPared2 = textureLoader.load('images/im2.png');
+const texturaTecho = textureLoader.load('images/im3.png');
+const texturaSuelo = textureLoader.load('images/im4.png');
+const texturaPared3 = textureLoader.load('images/im5.png');
+const texturaPared4 = textureLoader.load('images/im6.png');
 const texturaOro = textureLoader.load('images/oro.jpg');
 const texturaRojo = textureLoader.load('images/rojo2.jpg');
 // 1-inicializa 
@@ -54,11 +59,11 @@ function init()
   scene = new THREE.Scene();
 
   var aspectRatio = window.innerWidth / window.innerHeight;
-  camera = new THREE.PerspectiveCamera( 50, aspectRatio , 0.1, 2000 );
+  camera = new THREE.PerspectiveCamera( 50, aspectRatio , 0.1, 3000 );
   camera.position.set( 200, 500, 200 );
 
   cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
-  cameraControls.target.set( 0, 0, 0 );
+  cameraControls.target.set( 0, 200, 0 );
 
   camaraMini = new THREE.PerspectiveCamera( 50, 1 , 0.1, 2000 );
   camaraMini.position.set(0, 500, 0);
@@ -73,7 +78,53 @@ function loadScene()
 	// Añade el objeto grafico a la escena
     
   let material = new THREE.MeshStandardMaterial({ map: texturaSuelo}); 
-  //let material = new THREE.MeshStandardMaterial({color: 0xb8b9ba});          
+  let materialPared1 = new THREE.MeshStandardMaterial({ map: texturaPared1});
+  let materialPared2 = new THREE.MeshStandardMaterial({ map: texturaPared2});
+  let materialPared3 = new THREE.MeshStandardMaterial({ map: texturaPared3});
+  let materialPared4 = new THREE.MeshStandardMaterial({ map: texturaPared4});
+  let materialTecho = new THREE.MeshStandardMaterial({ map: texturaTecho});
+
+  let geometriaPared1 = new THREE.PlaneGeometry(1000, 1000);
+  let pared1 = new THREE.Mesh(geometriaPared1, materialPared1);
+  pared1.position.set(0, 500, -500);
+  scene.add(pared1);
+  let geometriaPared2 = new THREE.PlaneGeometry(1000, 1000);
+  let pared2 = new THREE.Mesh(geometriaPared2, materialPared2);
+  pared2.position.set(0, 500, 500);
+    pared2.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI) ;
+    scene.add(pared2);
+
+  let geometriaPared3 = new THREE.PlaneGeometry(1000, 1000);
+  let pared3 = new THREE.Mesh(geometriaPared3, materialPared3);
+  pared3.position.set(-500, 500, 0);
+  pared3.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2) ;
+  scene.add(pared3);
+
+  let geometriaPared4 = new THREE.PlaneGeometry(1000, 1000);
+  let pared4 = new THREE.Mesh(geometriaPared4, materialPared4);
+  pared4.position.set(500, 500, 0);
+  pared4.rotateOnAxis(new THREE.Vector3(0, 1, 0), -Math.PI / 2) ;
+  scene.add(pared4);
+
+  let geometriaTecho = new THREE.PlaneGeometry(1000, 1000);
+  let techo = new THREE.Mesh(geometriaTecho, materialTecho);
+  techo.position.set(0, 1000, 0);
+  techo.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2) ;
+  techo.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 2) ;
+  scene.add(techo);
+
+  let loader = new THREE.CubeTextureLoader();
+  let entornoRotula = loader.load([
+    'images/im1.png', // right
+    'images/im2.png', // left
+    'images/im3.png', // top
+    'images/im4.png', // bottom
+    'images/im5.png', // front
+    'images/im6.png'  // back
+  ]
+    );
+  
+
 
   //Un suelo (1000 x 1000) en el plano XZ
   let geometriaSuelo = new THREE.PlaneGeometry(1000, 1000);
@@ -82,38 +133,38 @@ function loadScene()
   scene.add(suelo)
 
   let geometriaBase = new THREE.CylinderGeometry(baseRadio, baseRadio, baseAltura, 32);
-  let materialBase = new THREE.MeshStandardMaterial({map: texturaRojo});
+  let materialBase = new THREE.MeshPhongMaterial({map: texturaRojo, shininess: 100});
   let base = new THREE.Mesh(geometriaBase, materialBase);
   base.position.y = baseAltura/2;
   //scene.add(base);
 
   let geometriaEje =  new THREE.CylinderGeometry(ejeRadio, ejeRadio, ejeAltura, 32);
-  let materialEje = new THREE.MeshStandardMaterial({map: texturaOro});
+  let materialEje = new THREE.MeshPhongMaterial({map: texturaOro, shininess: 100});
   let eje = new THREE.Mesh(geometriaEje, materialEje);
   eje.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
   
   //scene.add(eje);
 
   let geometriaEsparrago = new THREE.BoxGeometry(esparragoX, esparragoY, esparragoZ);
-  let materialEsparrago = new THREE.MeshStandardMaterial({map: texturaRojo});
+  let materialEsparrago = new THREE.MeshLambertMaterial({map: texturaRojo});
   let esparrago = new THREE.Mesh(geometriaEsparrago, materialEsparrago);
   esparrago.position.y = esparragoY/2;
   //scene.add(esparrago);
 
   let rotulaGeometria = new THREE.SphereGeometry(rotulaRadio, 32, 32);
-  let rotulaMaterial = new THREE.MeshStandardMaterial({map: texturaOro});
+  let rotulaMaterial = new THREE.MeshPhongMaterial({envMap: entornoRotula, map: texturaOro, shininess: 100});
   let rotula = new THREE.Mesh(rotulaGeometria, rotulaMaterial);
   rotula.position.y = esparragoY;
   //scene.add(rotula);
 
 
   let discoGeometria = new THREE.CylinderGeometry(discoRadio, discoRadio, discoAltura, 32);
-  let discoMaterial = new THREE.MeshStandardMaterial({map: texturaRojo});
+  let discoMaterial = new THREE.MeshLambertMaterial({map: texturaRojo});
   let disco = new THREE.Mesh(discoGeometria, discoMaterial);
   //scene.add(disco);
 
   let nervioGeometria = new THREE.BoxGeometry(nervioX, nervioY, nervioZ);
-  let nervioMaterial = new THREE.MeshStandardMaterial({map: texturaRojo});
+  let nervioMaterial = new THREE.MeshLambertMaterial({map: texturaRojo});
   let nervio1 = new THREE.Mesh(nervioGeometria, nervioMaterial);
   nervio1.position.y = discoAltura+ nervioY/2;
   nervio1.position.x = 10;
@@ -139,7 +190,7 @@ function loadScene()
   //scene.add(nervio4);
 
   let manoGeometria =  new THREE.CylinderGeometry(manoRadio, manoRadio, manoAltura, 32);
-  let manoMaterial = new THREE.MeshStandardMaterial({map: texturaOro});
+  let manoMaterial = new THREE.MeshPhongMaterial({map: texturaOro});
   let mano = new THREE.Mesh(manoGeometria, manoMaterial);
   mano.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
   
@@ -308,7 +359,7 @@ function loadScene()
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // luz ambiental
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); // luz ambiental
   scene.add(ambientLight);
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
