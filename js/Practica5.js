@@ -33,6 +33,8 @@ var objetivos = {
 
 const textureLoader = new THREE.TextureLoader();
 const texturaSuelo = textureLoader.load('images/suelo-fabrica2.jpg');
+const texturaOro = textureLoader.load('images/oro.jpg');
+const texturaRojo = textureLoader.load('images/rojo2.jpg');
 // 1-inicializa 
 init();
 // 2-Crea una escena
@@ -80,38 +82,38 @@ function loadScene()
   scene.add(suelo)
 
   let geometriaBase = new THREE.CylinderGeometry(baseRadio, baseRadio, baseAltura, 32);
-  let materialBase = new THREE.MeshStandardMaterial({color: 0xe60e07});
+  let materialBase = new THREE.MeshStandardMaterial({map: texturaRojo});
   let base = new THREE.Mesh(geometriaBase, materialBase);
   base.position.y = baseAltura/2;
   //scene.add(base);
 
   let geometriaEje =  new THREE.CylinderGeometry(ejeRadio, ejeRadio, ejeAltura, 32);
-  let materialEje = new THREE.MeshStandardMaterial({color: 0xfce914});
+  let materialEje = new THREE.MeshStandardMaterial({map: texturaOro});
   let eje = new THREE.Mesh(geometriaEje, materialEje);
   eje.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
   
   //scene.add(eje);
 
   let geometriaEsparrago = new THREE.BoxGeometry(esparragoX, esparragoY, esparragoZ);
-  let materialEsparrago = new THREE.MeshStandardMaterial({color: 0xe60e07});
+  let materialEsparrago = new THREE.MeshStandardMaterial({map: texturaRojo});
   let esparrago = new THREE.Mesh(geometriaEsparrago, materialEsparrago);
   esparrago.position.y = esparragoY/2;
   //scene.add(esparrago);
 
   let rotulaGeometria = new THREE.SphereGeometry(rotulaRadio, 32, 32);
-  let rotulaMaterial = new THREE.MeshStandardMaterial({color: 0xfce914});
+  let rotulaMaterial = new THREE.MeshStandardMaterial({map: texturaOro});
   let rotula = new THREE.Mesh(rotulaGeometria, rotulaMaterial);
   rotula.position.y = esparragoY;
   //scene.add(rotula);
 
 
   let discoGeometria = new THREE.CylinderGeometry(discoRadio, discoRadio, discoAltura, 32);
-  let discoMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
+  let discoMaterial = new THREE.MeshStandardMaterial({map: texturaRojo});
   let disco = new THREE.Mesh(discoGeometria, discoMaterial);
   //scene.add(disco);
 
   let nervioGeometria = new THREE.BoxGeometry(nervioX, nervioY, nervioZ);
-  let nervioMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
+  let nervioMaterial = new THREE.MeshStandardMaterial({map: texturaRojo});
   let nervio1 = new THREE.Mesh(nervioGeometria, nervioMaterial);
   nervio1.position.y = discoAltura+ nervioY/2;
   nervio1.position.x = 10;
@@ -137,14 +139,14 @@ function loadScene()
   //scene.add(nervio4);
 
   let manoGeometria =  new THREE.CylinderGeometry(manoRadio, manoRadio, manoAltura, 32);
-  let manoMaterial = new THREE.MeshStandardMaterial({color: 0xfce914});
+  let manoMaterial = new THREE.MeshStandardMaterial({map: texturaOro});
   let mano = new THREE.Mesh(manoGeometria, manoMaterial);
   mano.rotateOnAxis(new THREE.Vector3(1, 0, 0), -Math.PI / 2) ;
   
   //scene.add(mano);
 
     let agarreGeometria = new THREE.BoxGeometry(19, 20, 4);
-  let agarreMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
+  let agarreMaterial = new THREE.MeshStandardMaterial({map: texturaRojo});
   let agarre = new THREE.Mesh(agarreGeometria, agarreMaterial);
   agarre.position.x=19/2;
   agarre.position.z=10
@@ -194,7 +196,52 @@ function loadScene()
   ]);
   dedoGeometria.setAttribute('position', new THREE.BufferAttribute(verticesDedo, 3));
   dedoGeometria.computeVertexNormals();
-  let dedoMaterial = new THREE.MeshStandardMaterial({color: 0xe60e07});
+  let dedoMaterial = new THREE.MeshStandardMaterial({map: texturaRojo});
+  const uvs = new Float32Array([
+    0, 0,
+    1, 0,
+    1, 1,
+
+    0, 0,
+    1, 1,
+    0, 1,
+
+    0, 1,
+    0, 0,
+    1, 0,
+
+    0, 0,
+    1, 1,
+    1, 0,
+
+    0, 0,
+    0, 1,
+    1, 1,
+
+    1, 1,
+    1, 0,
+    0, 0,
+
+    0, 1,
+    0, 0,
+    1, 0,
+
+    1, 0,
+    1, 1,
+    0, 1,
+
+    0, 0,
+    0, 1,
+    1, 0,
+
+    1, 1,
+    1, 0,
+    0, 1,
+  ]);
+  dedoGeometria.setAttribute(
+    'uv',
+    new THREE.BufferAttribute(uvs, 2)
+  );
   let dedo = new THREE.Mesh(dedoGeometria, dedoMaterial);
   dedo.position.y = dedo.position.y -10;
   dedo.position.x = 19;
